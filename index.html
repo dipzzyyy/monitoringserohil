@@ -851,6 +851,7 @@
                         type="text"
                         placeholder="Cari PML..."
                         autocomplete="off"
+                        data-value=""
                     >
 
                     <div
@@ -1625,27 +1626,73 @@ async function loadData() {
 
 let pmlOptions = [];
 
+
 function populatePML() {
 
-    pmlOptions =
-        [
-            ...new Set(
-                allData
-                    .map(row =>
-                        getValue(
-                            row,
-                            ["PML"]
-                        )
-                    )
-                    .filter(Boolean)
+    const pmlMap =
+        new Map();
+
+
+    allData.forEach(row => {
+
+        const name =
+            getValue(
+                row,
+                ["PML"]
+            );
+
+
+        const email =
+            getValue(
+                row,
+                ["email PML"]
+            );
+
+
+        if (!email) return;
+
+
+        const cleanEmail =
+            String(email)
+                .trim()
+                .toLowerCase();
+
+
+        /*
+            Email = unique identity
+            Name  = display
+        */
+
+        if (
+            !pmlMap.has(
+                cleanEmail
             )
-        ]
-        .sort(
-            (a, b) =>
-                String(a).localeCompare(
-                    String(b)
-                )
-        );
+        ) {
+
+            pmlMap.set(
+                cleanEmail,
+                {
+                    name:
+                        String(name).trim(),
+
+                    email:
+                        cleanEmail
+                }
+            );
+
+        }
+
+    });
+
+
+    pmlOptions =
+        [...pmlMap.values()]
+            .sort(
+                (a, b) =>
+                    a.name.localeCompare(
+                        b.name
+                    )
+            );
 
 
     renderPMLDropdown(
@@ -1653,6 +1700,7 @@ function populatePML() {
     );
 
 }
+
 
 function renderPMLDropdown(
     searchText
@@ -1672,14 +1720,25 @@ function renderPMLDropdown(
         .toLowerCase();
 
 
+    /*
+        Search by PML name OR email
+    */
+
     const matches =
         pmlOptions
             .filter(pml =>
-                String(pml)
+                pml.name
+                    .toLowerCase()
+                    .includes(search)
+                ||
+                pml.email
                     .toLowerCase()
                     .includes(search)
             )
-            .slice(0, 100);
+            .slice(
+                0,
+                100
+            );
 
 
     dropdown.innerHTML = `
@@ -1697,9 +1756,15 @@ function renderPMLDropdown(
 
                     <div
                         class="search-option"
-                        data-value="${escapeHTML(pml)}"
+                        data-value="${escapeHTML(
+                            pml.email
+                        )}"
                     >
-                        ${escapeHTML(pml)}
+
+                        ${escapeHTML(
+                            pml.name
+                        )}
+
                     </div>
 
                 `
@@ -1711,7 +1776,9 @@ function renderPMLDropdown(
 
     dropdown
         .classList
-        .add("open");
+        .add(
+            "open"
+        );
 
 
     dropdown
@@ -1721,30 +1788,63 @@ function renderPMLDropdown(
         .forEach(option => {
 
             option.addEventListener(
-                "click",
-                () => {
+    "click",
+    () => {
 
-                    const value =
-                        option.dataset.value;
+        const value =
+            option.dataset.value;
 
-
+                const input =
                     document.getElementById(
                         "pmlFilter"
-                    ).value =
-                        value;
+                    );
 
 
-                    dropdown
-                        .classList
-                        .remove("open");
+                const selected =
+                    pmlOptions.find(
+                        pml =>
+                            pml.email ===
+                            value
+                    );
 
 
-                    populatePPL();
+                /*
+                    Show NAME in the input
+                    Store EMAIL internally
+                */
 
-                    applyFilters();
+                if (selected) {
+
+                    input.value =
+                        selected.name;
+
+                    input.dataset.value =
+                        selected.email;
+
+                } else {
+
+                    input.value =
+                        "";
+
+                    input.dataset.value =
+                        "";
 
                 }
-            );
+
+
+                dropdown
+                    .classList
+                    .remove(
+                        "open"
+                    );
+
+
+                populatePPL();
+
+                applyFilters();
+
+            }
+        );
 
         });
 
@@ -1755,12 +1855,29 @@ function renderPMLDropdown(
    POPULATE PPL
 ========================================================= */
 
+/* =========================================================
+   POPULATE PPL
+========================================================= */
+
 function populatePPL() {
 
-    const pml =
+    /*
+        PML identity is EMAIL.
+        The visible pmlFilter contains the NAME.
+    */
+
+    const pmlInput =
         document.getElementById(
             "pmlFilter"
-        ).value;
+        );
+
+
+    const selectedPMLEmail =
+        String(
+            pmlInput.dataset.value || ""
+        )
+        .trim()
+        .toLowerCase();
 
 
     const select =
@@ -1769,54 +1886,139 @@ function populatePPL() {
         );
 
 
+    /*
+        Remember currently selected PPL email
+    */
+
     const current =
         select.value;
 
+
+    /*
+        Start with all data
+    */
 
     let rows =
         allData;
 
 
-    if (pml) {
+    /*
+        Filter PPLs by PML EMAIL
+    */
+
+    if (selectedPMLEmail) {
 
         rows =
-            rows.filter(
-                row =>
-                    getValue(
-                        row,
-                        ["PML"]
-                    ) === pml
-            );
+            rows.filter(row => {
+
+                const rowPMLEmail =
+                    String(
+                        getValue(
+                            row,
+                            ["email PML"]
+                        )
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                return (
+                    rowPMLEmail ===
+                    selectedPMLEmail
+                );
+
+            });
 
     }
 
 
-    const ppls =
-        [
-            ...new Set(
-                rows
-                    .map(row =>
-                        getValue(
-                            row,
-                            ["PPL"]
-                        )
-                    )
-                    .filter(Boolean)
+    /*
+        Use PPL EMAIL as unique identity.
+        PPL NAME is only for display.
+    */
+
+    const pplMap =
+        new Map();
+
+
+    rows.forEach(row => {
+
+        const name =
+            getValue(
+                row,
+                ["PPL"]
+            );
+
+
+        const email =
+            getValue(
+                row,
+                ["email PPL"]
+            );
+
+
+        if (!email) return;
+
+
+        const cleanEmail =
+            String(email)
+                .trim()
+                .toLowerCase();
+
+
+        if (
+            !pplMap.has(
+                cleanEmail
             )
-        ]
-        .sort(
-            (a, b) =>
-                String(a).localeCompare(
-                    String(b)
-                )
-        );
+        ) {
+
+            pplMap.set(
+                cleanEmail,
+                {
+                    name:
+                        String(name)
+                            .trim(),
+
+                    email:
+                        cleanEmail
+                }
+            );
+
+        }
+
+    });
 
 
-    select.innerHTML =
-        `<option value="">
+    /*
+        Convert Map → array
+    */
+
+    const ppls =
+        [...pplMap.values()]
+            .sort(
+                (a, b) =>
+                    a.name.localeCompare(
+                        b.name
+                    )
+            );
+
+
+    /*
+        Rebuild dropdown
+    */
+
+    select.innerHTML = `
+
+        <option value="">
             Semua PPL
-        </option>`;
+        </option>
 
+    `;
+
+
+    /*
+        Add PPLs
+    */
 
     ppls.forEach(ppl => {
 
@@ -1826,10 +2028,27 @@ function populatePPL() {
             );
 
 
-        option.value = ppl;
+        /*
+            Internal identity
+            = EMAIL
+        */
 
-        option.textContent = ppl;
+        option.value =
+            ppl.email;
 
+
+        /*
+            Visible text
+            = NAME
+        */
+
+        option.textContent =
+            ppl.name;
+
+        /*
+            Tooltip shows email for clarity
+        */
+        option.title = ppl.email;
 
         select.appendChild(
             option
@@ -1838,16 +2057,24 @@ function populatePPL() {
     });
 
 
+    /*
+        Restore previous selection
+    */
+
     if (
-        ppls.includes(current)
+        ppls.some(
+            ppl =>
+                ppl.email ===
+                current
+        )
     ) {
 
-        select.value = current;
+        select.value =
+            current;
 
     }
 
 }
-
 
 /* =========================================================
    APPLY FILTERS
@@ -1858,7 +2085,7 @@ function applyFilters() {
     const pml =
         document.getElementById(
             "pmlFilter"
-        ).value;
+        ).dataset.value || "";
 
 
     const ppl =
@@ -1878,22 +2105,34 @@ function applyFilters() {
     filteredData =
         allData.filter(row => {
 
-
             /*
                 PML filter
+                Uses email as the unique identity
             */
-
             if (pml) {
 
-                const rowPML =
-                    getValue(
-                        row,
-                        ["PML"]
-                    );
+                const rowPMLEmail =
+                    String(
+                        getValue(
+                            row,
+                            ["email PML"]
+                        )
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                const selectedPMLEmail =
+                    String(
+                        pml
+                    )
+                    .trim()
+                    .toLowerCase();
 
 
                 if (
-                    rowPML !== pml
+                    rowPMLEmail !==
+                    selectedPMLEmail
                 ) {
 
                     return false;
@@ -1905,19 +2144,33 @@ function applyFilters() {
 
             /*
                 PPL filter
+                Uses email as the unique identity
             */
 
             if (ppl) {
 
-                const rowPPL =
-                    getValue(
-                        row,
-                        ["PPL"]
-                    );
+                const rowPPLEmail =
+                    String(
+                        getValue(
+                            row,
+                            ["email PPL"]
+                        )
+                    )
+                    .trim()
+                    .toLowerCase();
+
+
+                const selectedPPLEmail =
+                    String(
+                        ppl
+                    )
+                    .trim()
+                    .toLowerCase();
 
 
                 if (
-                    rowPPL !== ppl
+                    rowPPLEmail !==
+                    selectedPPLEmail
                 ) {
 
                     return false;
@@ -1925,7 +2178,6 @@ function applyFilters() {
                 }
 
             }
-
 
             /*
                 Search
@@ -1992,15 +2244,17 @@ function updateDashboard() {
         new Set(
             filteredData
                 .map(row =>
-                    getValue(
-                        row,
-                        ["PPL"]
+                    String(
+                        getValue(
+                            row,
+                            ["email PPL"]
+                        )
                     )
+                    .trim()
+                    .toLowerCase()
                 )
                 .filter(Boolean)
         );
-
-
     /*
         SLS count
 
@@ -2175,7 +2429,7 @@ function updateDashboard() {
 
 
         openCount.textContent =
-            "Sudah selesai";
+            "Semua prelist sudah dikerjakan";
 
 
         openSub.textContent =
@@ -2281,11 +2535,13 @@ function updateShortageCard(
 
 
         value.textContent =
-            "Sudah melebihi perkiraan";
+            formatNumber(
+                total
+            );
 
 
         sub.textContent =
-            "Tidak ada kekurangan";
+            "Good job! Tingkatkan lagi penemuan usaha ya!";
 
     }
 
@@ -2435,8 +2691,7 @@ function openShortageModal(type) {
 
             <div class="empty">
 
-                🟢 Tidak ada SLS yang mengalami
-                kekurangan.
+                🟢 Good job! Tingkatkan pencarian usaha di SLS kamu ya!
 
             </div>
 
