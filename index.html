@@ -2798,6 +2798,22 @@ function openShortageModal(type) {
                                         )
                                     );
 
+                                const openKeluarga =
+                                    toNumber(
+                                        getValue(
+                                            row,
+                                            ["Open Keluarga"]
+                                        )
+                                    );
+
+                                const openUsaha =
+                                    toNumber(
+                                        getValue(
+                                            row,
+                                            ["Open Usaha"]
+                                        )
+                                    );
+
 
                                 return `
 
@@ -2920,6 +2936,55 @@ function openShortageModal(type) {
                                                     >
                                                         ${formatNumber(
                                                             usaha
+                                                        )}
+                                                    </div>
+
+                                                </div>
+
+                                                <div>
+
+                                                    <div
+                                                        style="
+                                                            font-size:10px;
+                                                            color:#6b7280;
+                                                        "
+                                                    >
+                                                        Open Keluarga
+                                                    </div>
+
+                                                    <div
+                                                        style="
+                                                            font-weight:800;
+                                                            font-size:16px;
+                                                        "
+                                                    >
+                                                        ${formatNumber(
+                                                            openKeluarga
+                                                        )}
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div>
+
+                                                    <div
+                                                        style="
+                                                            font-size:10px;
+                                                            color:#6b7280;
+                                                        "
+                                                    >
+                                                        Open Usaha
+                                                    </div>
+
+                                                    <div
+                                                        style="
+                                                            font-weight:800;
+                                                            font-size:16px;
+                                                        "
+                                                    >
+                                                        ${formatNumber(
+                                                            openUsaha
                                                         )}
                                                     </div>
 
@@ -3357,25 +3422,79 @@ function closeSLSModal() {
 
 function resetFilters() {
 
-    document.getElementById(
-        "pmlFilter"
-    ).value = "";
+    const pmlFilter =
+        document.getElementById(
+            "pmlFilter"
+        );
 
+
+    const pplFilter =
+        document.getElementById(
+            "pplFilter"
+        );
+
+
+    const searchFilter =
+        document.getElementById(
+            "searchFilter"
+        );
+
+
+    /*
+        Clear PML display
+        AND its hidden email identity
+    */
+
+    pmlFilter.value = "";
+
+    pmlFilter.dataset.value = "";
+
+
+    /*
+        Clear PPL
+    */
+
+    pplFilter.value = "";
+
+
+    /*
+        Clear search
+    */
+
+    searchFilter.value = "";
+
+
+    /*
+        Rebuild PPL list
+        using ALL PMLs again
+    */
 
     populatePPL();
 
 
-    document.getElementById(
-        "pplFilter"
-    ).value = "";
-
-
-    document.getElementById(
-        "searchFilter"
-    ).value = "";
-
+    /*
+        Apply completely empty filters
+    */
 
     applyFilters();
+
+
+    /*
+        Optional: close PML dropdown
+    */
+
+    const dropdown =
+        document.getElementById(
+            "pmlDropdown"
+        );
+
+    if (dropdown) {
+
+        dropdown.classList.remove(
+            "open"
+        );
+
+    }
 
 }
 
