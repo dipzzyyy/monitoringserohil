@@ -793,9 +793,36 @@
                     Dashboard Pendataan Sensus Ekonomi 2026 Rokan Hilir
                 </h1>
 
-                <p>
-                    Monitoring progress PML, PPL, dan SLS (Kondisi 18 Agustus 2026 06.00)
+                <p id="last-updated">
+                    Monitoring progress PML, PPL, dan SLS
                 </p>
+
+                <script>
+                function getMonitoringDate() {
+                    const now = new Date();
+
+                    // Jakarta time (WIB / UTC+7)
+                    const jakarta = new Date(
+                        now.toLocaleString("en-US", {
+                            timeZone: "Asia/Jakarta"
+                        })
+                    );
+
+                    // Before 09:00 → use yesterday
+                    if (jakarta.getHours() < 9) {
+                        jakarta.setDate(jakarta.getDate() - 1);
+                    }
+
+                    return jakarta.toLocaleDateString("id-ID", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric"
+                    });
+                }
+
+                document.getElementById("last-updated").textContent =
+                    `Monitoring progress PML, PPL, dan SLS (Kondisi ${getMonitoringDate()} 06.00)`;
+                </script>
 
             </div>
 
@@ -1158,7 +1185,7 @@ const SUPABASE_SCHEMA =
     "public";
 
 const SUPABASE_TABLE =
-    "monitoring";
+    "bellybutton";
 
 
 /* =========================================================
