@@ -1,0 +1,3745 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Revisit SE2026 — Kabupaten Rokan Hilir</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:#172033;
+  background:#f5f7fb
+}
+
+*{box-sizing:border-box}
+body{margin:0}
+button,select,input{font:inherit}
+.hidden{display:none!important}
+
+header{
+  background:#fff;
+  border-bottom:1px solid #e7eaf0;
+  padding:18px 28px;
+  position:sticky;
+  top:0;
+  z-index:20
+}
+
+.brand{font-size:20px;font-weight:800}
+.sub{font-size:13px;color:#667085;margin-top:3px}
+
+main{
+  max-width:1600px;
+  margin:auto;
+  padding:28px
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e7eaf0;
+  border-radius:14px;
+  box-shadow:0 4px 18px rgba(0,0,0,.035);
+  padding:22px
+}
+
+.welcome{
+  max-width:720px;
+  margin:55px auto
+}
+
+.welcome h1{
+  font-size:30px;
+  line-height:1.15;
+  margin:0 0 8px
+}
+
+.welcome p{
+  color:#667085;
+  margin:0 0 26px
+}
+
+label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  margin:14px 0 7px
+}
+
+select,input{
+  width:100%;
+  height:40px;
+  border:1px solid #d7dce5;
+  border-radius:9px;
+  background:#fff;
+  padding:0 11px;
+  outline:none
+}
+
+select:focus,input:focus{
+  border-color:#7886a8;
+  box-shadow:0 0 0 3px rgba(120,134,168,.12)
+}
+
+.btn{
+  height:40px;
+  border:0;
+  border-radius:9px;
+  padding:0 15px;
+  font-weight:700;
+  cursor:pointer;
+  background:#172033;
+  color:#fff
+}
+
+.btn.secondary{
+  background:#fff;
+  color:#172033;
+  border:1px solid #d7dce5
+}
+
+.nav{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:18px
+}
+
+.nav .active{
+  background:#172033;
+  color:#fff;
+  border-color:#172033
+}
+
+.nav button{
+  background:#fff;
+  color:#172033;
+  border:1px solid #d7dce5
+}
+
+.toolbar{
+  display:flex;
+  gap:14px;
+  align-items:end;
+  flex-wrap:wrap
+}
+
+.field{
+  min-width:200px;
+  flex:1
+}
+
+.field.small{
+  max-width:190px
+}
+
+.field.search{
+  min-width:280px;
+  flex:1.5
+}
+
+.title-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin:25px 0 12px
+}
+
+.title-row h2{
+  font-size:18px;
+  margin:0
+}
+
+.status{
+  font-size:13px;
+  color:#667085
+}
+
+.saving{color:#9a6700}
+.saved{color:#177245}
+.error{color:#b42318}
+
+.table-wrap{
+  overflow:auto;
+  border:1px solid #e7eaf0;
+  border-radius:11px;
+  background:#fff;
+  max-height:58vh
+}
+
+.table-wrap table{
+  border-collapse:separate;
+  border-spacing:0
+}
+
+.table-wrap thead th{
+  position:sticky;
+  top:0;
+  z-index:12
+}
+
+.priority-legend{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  margin:0;
+  font-size:12px;
+  color:#667085
+}
+
+.priority-item{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  line-height:1
+}
+
+.priority-swatch,
+.priority-dot{
+  width:11px;
+  height:11px;
+  min-width:11px;
+  border-radius:50%;
+  border:1px solid rgba(0,0,0,.12);
+  display:inline-block
+}
+
+.swatch-1,
+.priority-dot-1{
+  background:#ffc7c7
+}
+
+.swatch-2,
+.priority-dot-2{
+  background:#ffe89a
+}
+
+.swatch-3,
+.priority-dot-3{
+  background:#bfe8c7
+}
+
+.priority-dot{
+  margin-right:7px;
+  vertical-align:-1px
+}
+
+.coverage-ok{
+  display:inline-block;
+  margin-left:6px;
+  padding:3px 7px;
+  border-radius:999px;
+  background:#dcfce7;
+  color:#166534;
+  font-size:11px;
+  font-weight:800;
+  vertical-align:1px
+}
+
+.title-row .priority-legend{
+  margin-left:auto
+}
+
+.title-row h2{
+  min-width:0
+}
+
+.sticky-first th:first-child,
+.sticky-first td:first-child{
+  position:sticky;
+  left:0;
+  z-index:10;
+  background:#fff
+}
+
+.sticky-first th:first-child{
+  z-index:20;
+  background:#f8f9fb
+}
+
+.sticky-second th:nth-child(2),
+.sticky-second td:nth-child(2){
+  position:sticky;
+  left:0;
+  z-index:10;
+  background:#fff
+}
+
+.sticky-second th:nth-child(2){
+  z-index:20;
+  background:#f8f9fb
+}
+
+table{
+  border-collapse:collapse;
+  width:100%;
+  font-size:13px;
+  min-width:980px
+}
+
+th,td{
+  padding:10px 11px;
+  border-bottom:1px solid #edf0f4;
+  text-align:left;
+  white-space:nowrap
+}
+
+th{
+  background:#f8f9fb;
+  font-size:12px;
+  color:#596273;
+  position:sticky;
+  top:0;
+  z-index:5
+}
+
+tr:last-child td{
+  border-bottom:0
+}
+
+.num{text-align:right}
+.entry{width:110px;height:34px}
+.pct{font-weight:800}
+
+.empty,
+.loading{
+  padding:30px;
+  text-align:center;
+  color:#667085
+}
+
+.readonly{
+  background:#f8f9fb
+}
+
+.day-head{
+  text-align:center!important
+}
+
+.subhead{
+  text-align:center!important;
+  font-size:11px!important
+}
+
+.search-select{
+  position:relative
+}
+
+.search-dropdown{
+  position:absolute;
+  left:0;
+  right:0;
+  top:100%;
+  margin-top:4px;
+  background:#fff;
+  border:1px solid #d7dce5;
+  border-radius:9px;
+  max-height:280px;
+  overflow-y:auto;
+  z-index:50;
+  box-shadow:0 8px 25px rgba(0,0,0,.08)
+}
+
+.search-option{
+  padding:10px 12px;
+  cursor:pointer;
+  font-size:14px
+}
+
+.search-option:hover{
+  background:#f2f4f7
+}
+
+.search-empty{
+  padding:12px;
+  color:#667085;
+  font-size:13px
+}
+
+.filter-note{
+  font-size:12px;
+  color:#667085;
+  margin-top:8px
+}
+
+@media(max-width:700px){
+  main{padding:15px}
+  .welcome{margin:30px auto}
+  .welcome h1{font-size:25px}
+  header{padding:15px}
+  .field,
+  .field.small,
+  .field.search{
+    max-width:none;
+    min-width:100%
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">Dashboard Revisit SE2026</div>
+  <div class="sub">Kabupaten Rokan Hilir</div>
+</header>
+
+<main>
+
+<section id="welcome" class="card welcome">
+
+  <h1>Dashboard Revisit SE2026</h1>
+  <p>Kabupaten Rokan Hilir</p>
+
+  <label for="pmlSearch">PML</label>
+
+  <div class="search-select" id="pmlSearchBox">
+
+    <input
+      id="pmlSearch"
+      type="text"
+      placeholder="Search PML..."
+      autocomplete="off"
+    >
+
+    <div id="pmlDropdown" class="search-dropdown hidden"></div>
+
+    <input type="hidden" id="welcomePml">
+
+  </div>
+
+  <button
+    id="startBtn"
+    class="btn"
+    style="width:100%;margin-top:18px"
+  >
+    Continue
+  </button>
+
+  <div
+    id="welcomeStatus"
+    class="status"
+    style="margin-top:12px"
+  ></div>
+
+</section>
+
+
+<section id="app" class="hidden">
+
+  <div class="nav">
+
+    <button id="dailyNav" class="btn active">
+      Daily Entry
+    </button>
+
+    <button id="allNav" class="btn">
+      All PPL / PML
+    </button>
+
+    <button id="detailNav" class="btn">
+      Rincian SLS
+    </button>
+
+    <button id="desaNav" class="btn">
+      Rekap Desa
+    </button>
+
+    <button id="kecNav" class="btn">
+      Rekap Kecamatan
+    </button>
+
+    <button id="changePml" class="btn secondary">
+      Change PML
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       DAILY ENTRY
+  ====================================================== -->
+
+  <section id="dailyPage">
+
+    <div class="card">
+
+      <div class="toolbar">
+
+        <div class="field">
+          <label>PML</label>
+          <select id="pmlSelect"></select>
+        </div>
+
+        <div class="field">
+          <label>PPL</label>
+          <select id="pplSelect">
+            <option value="">Select PPL</option>
+          </select>
+        </div>
+
+        <div class="field small">
+          <label>Date</label>
+          <select id="dateSelect"></select>
+        </div>
+
+      </div>
+
+      <div
+        id="entryStatus"
+        class="status"
+        style="margin-top:12px"
+      ></div>
+
+    </div>
+
+
+    <div class="title-row">
+
+      <h2>
+        Table 1 — Daily Revisit Entry
+      </h2>
+
+      <span id="rowCount" class="status"></span>
+
+      <span class="priority-legend">
+
+        <span style="font-weight:700;color:#172033">
+          Prioritas:
+        </span>
+
+        <span class="priority-item">
+          <span class="priority-swatch swatch-1"></span>
+          Prioritas 1
+        </span>
+
+        <span class="priority-item">
+          <span class="priority-swatch swatch-2"></span>
+          Prioritas 2
+        </span>
+
+        <span class="priority-item">
+          <span class="priority-swatch swatch-3"></span>
+          Prioritas 3
+        </span>
+
+      </span>
+
+    </div>
+
+
+    <div id="entryTable" class="table-wrap">
+      <div class="empty">
+        Select PPL and date.
+      </div>
+    </div>
+
+
+    <div class="title-row">
+
+      <h2 id="summaryTitle">
+        Summary PPL
+      </h2>
+
+      <span class="status">
+        Cumulative through selected date
+      </span>
+
+      <span class="priority-legend">
+
+        <span style="font-weight:700;color:#172033">
+          Prioritas:
+        </span>
+
+        <span class="priority-item">
+          <span class="priority-swatch swatch-1"></span>
+          Prioritas 1
+        </span>
+
+        <span class="priority-item">
+          <span class="priority-swatch swatch-2"></span>
+          Prioritas 2
+        </span>
+
+        <span class="priority-item">
+          <span class="priority-swatch swatch-3"></span>
+          Prioritas 3
+        </span>
+
+      </span>
+
+    </div>
+
+
+    <div id="summaryTable" class="table-wrap">
+      <div class="empty">
+        Select PPL and date.
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       ALL PPL / PML
+  ====================================================== -->
+
+  <section id="allPage" class="hidden">
+
+    <div class="card">
+
+      <div class="toolbar">
+
+        <div class="field small">
+          <label>End date</label>
+          <select id="allDate"></select>
+        </div>
+
+        <div class="field">
+          <label>PML filter</label>
+          <select id="allPml">
+            <option value="">All PML</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>PPL filter</label>
+          <select id="allPpl">
+            <option value="">All PPL</option>
+          </select>
+        </div>
+
+        <div class="field search">
+          <label>Search</label>
+          <input
+            id="allSearch"
+            type="search"
+            placeholder="Search idsls, desa, nama SLS, PPL or PML..."
+          >
+        </div>
+
+      </div>
+
+      <div class="filter-note">
+        Each date shows only the progress entered on that day; blank means no entry.
+      </div>
+
+      <div
+        id="allStatus"
+        class="status"
+        style="margin-top:12px"
+      ></div>
+
+    </div>
+
+
+    <div class="title-row">
+
+      <h2>
+        All PPL / PML Summary
+      </h2>
+
+      <span class="priority-legend">
+
+        <span style="font-weight:700;color:#172033">
+          Prioritas:
+        </span>
+
+        <span class="priority-item">
+          <span class="priority-swatch swatch-1"></span>
+          Prioritas 1
+        </span>
+
+        <span class="priority-item">
+          <span class="priority-swatch swatch-2"></span>
+          Prioritas 2
+        </span>
+
+        <span class="priority-item">
+          <span class="priority-swatch swatch-3"></span>
+          Prioritas 3
+        </span>
+
+      </span>
+
+    </div>
+
+
+    <div id="allTable" class="table-wrap">
+      <div class="loading">Loading...</div>
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       RINCIAN SLS
+  ====================================================== -->
+
+  <section id="detailPage" class="hidden">
+
+    <div class="card">
+
+      <div class="toolbar">
+
+        <div class="field">
+          <label>PML filter</label>
+          <select id="detailPml">
+            <option value="">All PML</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>PPL filter</label>
+          <select id="detailPpl">
+            <option value="">All PPL</option>
+          </select>
+        </div>
+
+        <div class="field search">
+          <label>Search</label>
+          <input
+            id="detailSearch"
+            type="search"
+            placeholder="Search idsls, desa, nama SLS, PPL or PML..."
+          >
+        </div>
+
+      </div>
+
+      <div class="filter-note">
+        Each date shows only the progress entered that day:
+        keluarga, non pertanian, pertanian.
+      </div>
+
+      <div
+        id="detailStatus"
+        class="status"
+        style="margin-top:12px"
+      ></div>
+
+    </div>
+
+
+    <div class="title-row">
+
+      <h2>Rincian SLS</h2>
+
+      <span class="priority-legend">
+
+        <span style="font-weight:700;color:#172033">
+          Prioritas:
+        </span>
+
+        <span class="priority-item">
+          <span class="priority-swatch swatch-1"></span>
+          Prioritas 1
+        </span>
+
+        <span class="priority-item">
+          <span class="priority-swatch swatch-2"></span>
+          Prioritas 2
+        </span>
+
+        <span class="priority-item">
+          <span class="priority-swatch swatch-3"></span>
+          Prioritas 3
+        </span>
+
+      </span>
+
+    </div>
+
+
+    <div id="detailTable" class="table-wrap">
+      <div class="loading">Loading...</div>
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       REKAP DESA
+       SOURCE: all_sls
+  ====================================================== -->
+
+  <section id="desaPage" class="hidden">
+
+    <div class="card">
+
+      <div class="toolbar">
+
+        <div class="field small">
+          <label>End date</label>
+          <select id="desaDate"></select>
+        </div>
+
+        <div class="field search">
+          <label>Search</label>
+          <input
+            id="desaSearch"
+            type="search"
+            placeholder="Search kecamatan or desa..."
+          >
+        </div>
+
+      </div>
+
+      <div
+        id="desaStatus"
+        class="status"
+        style="margin-top:12px"
+      ></div>
+
+    </div>
+
+
+    <div class="title-row">
+
+      <h2>Rekap Desa</h2>
+
+      <span class="status">
+        All SLS · Grouped by first 10 digits of idsls
+      </span>
+
+    </div>
+
+
+    <div id="desaTable" class="table-wrap">
+      <div class="loading">Loading...</div>
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       REKAP KECAMATAN
+       SOURCE: all_sls
+  ====================================================== -->
+
+  <section id="kecPage" class="hidden">
+
+    <div class="card">
+
+      <div class="toolbar">
+
+        <div class="field small">
+          <label>End date</label>
+          <select id="kecDate"></select>
+        </div>
+
+        <div class="field search">
+          <label>Search</label>
+          <input
+            id="kecSearch"
+            type="search"
+            placeholder="Search kecamatan..."
+          >
+        </div>
+
+      </div>
+
+      <div
+        id="kecStatus"
+        class="status"
+        style="margin-top:12px"
+      ></div>
+
+    </div>
+
+
+    <div class="title-row">
+
+      <h2>Rekap Kecamatan</h2>
+
+      <span class="status">
+        All SLS · Grouped by first 7 digits of idsls
+      </span>
+
+    </div>
+
+
+    <div id="kecTable" class="table-wrap">
+      <div class="loading">Loading...</div>
+    </div>
+
+  </section>
+
+</section>
+
+</main>
+
+
+<script>
+
+const SUPABASE_URL=
+  "https://wtuqlwtnxvjbuqqbqmjj.supabase.co";
+
+const SUPABASE_KEY=
+  "sb_publishable_p2XnjHJrUC0QVZQTQO2pVw_CdFJTxfW";
+
+const MASTER_TABLE='revisit_sls';
+
+const ALL_SLS_TABLE='all_sls';
+
+const LOG_TABLE='revisit_daily';
+
+const sb=
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+const $=id=>
+  document.getElementById(id);
+
+
+/* =====================================================
+   DATES
+===================================================== */
+
+const dates=[];
+
+for(let i=17;i<=30;i++){
+
+  dates.push(
+    `2026-09-${String(i).padStart(2,'0')}`
+  );
+
+}
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let master=[];
+let allSls=[];
+let logs=[];
+
+let selectedPml='';
+let selectedPpl='';
+let selectedDate='';
+
+const saveTimers=new Map();
+
+let schema={
+  pml:null,
+  ppl:null,
+  kec:null
+};
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function esc(v){
+
+  return String(v??'').replace(
+    /[&<>"']/g,
+    m=>({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      '"':'&quot;',
+      "'":'&#039;'
+    }[m])
+  );
+
+}
+
+
+function n(v){
+
+  const x=Number(v);
+
+  return Number.isFinite(x)
+    ? x
+    : 0;
+
+}
+
+
+function pct(v,t){
+
+  return t
+    ? ((v/t)*100)
+    : 0;
+
+}
+
+
+function fmtPct(x){
+
+  return Number(x).toFixed(1)+'%';
+
+}
+
+
+function fmtDate(d){
+
+  return new Date(
+    d+'T00:00:00'
+  ).toLocaleDateString(
+    'en-GB',
+    {
+      day:'2-digit',
+      month:'short',
+      year:'numeric'
+    }
+  );
+
+}
+
+
+function normalizeKey(v){
+
+  return String(v??'')
+    .toLowerCase()
+    .replace(/[\s_\-]+/g,'');
+
+}
+
+
+function actualColumn(row,wanted){
+
+  const w=normalizeKey(wanted);
+
+  return Object.keys(row||{})
+    .find(
+      k=>normalizeKey(k)===w
+    )||null;
+
+}
+
+
+function getField(row,wanted){
+
+  const col=
+    actualColumn(
+      row,
+      wanted
+    );
+
+  return col
+    ? row[col]
+    : undefined;
+
+}
+
+
+function people(field){
+
+  return [
+    ...new Set(
+      master
+        .map(
+          r=>
+            String(
+              getField(r,field)??''
+            ).trim()
+        )
+        .filter(Boolean)
+    )
+  ].sort(
+    (a,b)=>
+      a.localeCompare(b)
+  );
+
+}
+
+
+/* =====================================================
+   MASTER / LOG HELPERS
+===================================================== */
+
+function rowsForPpl(){
+
+  return master.filter(r=>
+    String(
+      getField(r,'PML')??''
+    ).trim()===selectedPml
+    &&
+    String(
+      getField(r,'PPL')??''
+    ).trim()===selectedPpl
+  );
+
+}
+
+
+function currentLog(id,date){
+
+  return logs.find(
+    x=>
+      String(x.idsls)===String(id)
+      &&
+      x.tanggal===date
+  )||{};
+
+}
+
+
+function totalProgress(log){
+
+  return (
+    n(log.realisasi_keluarga)
+    +
+    n(log.realisasi_usaha_np)
+    +
+    n(log.realisasi_usaha_pertanian)
+  );
+
+}
+
+
+function cumulative(id,date){
+
+  return logs
+    .filter(
+      x=>
+        String(x.idsls)===String(id)
+        &&
+        x.tanggal<=date
+    )
+    .reduce(
+      (s,x)=>
+        s+totalProgress(x),
+      0
+    );
+
+}
+
+
+function daily(id,date){
+
+  const x=
+    currentLog(
+      id,
+      date
+    );
+
+  return x.idsls!==undefined
+    ? totalProgress(x)
+    : null;
+
+}
+
+
+function component(id,date,field){
+
+  const x=
+    currentLog(
+      id,
+      date
+    );
+
+  return x.idsls!==undefined
+    ? n(x[field])
+    : null;
+
+}
+
+
+function cumulativeComponent(
+  id,
+  date,
+  field
+){
+
+  return logs
+    .filter(
+      x=>
+        String(x.idsls)===String(id)
+        &&
+        x.tanggal<=date
+    )
+    .reduce(
+      (s,x)=>
+        s+n(x[field]),
+      0
+    );
+
+}
+
+
+function baseTotalCapaian(r){
+
+  return n(
+    getField(
+      r,
+      'Total Capaian'
+    )
+  );
+
+}
+
+
+function cumulativeFromMaster(
+  id,
+  date
+){
+
+  const r=
+    master.find(
+      x=>
+        String(
+          getField(x,'idsls')
+        )===String(id)
+    );
+
+  if(!r)
+    return 0;
+
+  return (
+    baseTotalCapaian(r)
+    +
+    logs
+      .filter(
+        x=>
+          String(x.idsls)===String(id)
+          &&
+          x.tanggal<=date
+      )
+      .reduce(
+        (s,x)=>
+          s+totalProgress(x),
+        0
+      )
+  );
+
+}
+
+
+/* =====================================================
+   PRIORITY
+===================================================== */
+
+function priorityValue(r){
+
+  const v=
+    String(
+      getField(
+        r,
+        'Prioritas'
+      )??''
+    ).trim();
+
+  const m=
+    v.match(/[123]/);
+
+  return m
+    ? m[0]
+    : null;
+
+}
+
+
+function priorityDot(p){
+
+  return p
+    ? `<span
+         class="priority-dot priority-dot-${p}"
+         title="Prioritas ${p}"
+       ></span>`
+    : '';
+
+}
+
+
+function priorityLegend(){
+
+  return `
+    <span class="priority-legend">
+
+      <span style="font-weight:700;color:#172033">
+        Prioritas:
+      </span>
+
+      <span class="priority-item">
+        <span class="priority-swatch swatch-1"></span>
+        Prioritas 1
+      </span>
+
+      <span class="priority-item">
+        <span class="priority-swatch swatch-2"></span>
+        Prioritas 2
+      </span>
+
+      <span class="priority-item">
+        <span class="priority-swatch swatch-3"></span>
+        Prioritas 3
+      </span>
+
+    </span>
+  `;
+
+}
+
+
+function coverageLabel(v,t){
+
+  return t>0 && v>=t
+    ? '<span class="coverage-ok">Cakupan Terpenuhi</span>'
+    : '';
+
+}
+
+
+/* =====================================================
+   LOAD revisit_sls
+===================================================== */
+
+async function loadMaster(){
+
+  const pageSize=1000;
+
+  let from=0;
+
+  const all=[];
+
+  while(true){
+
+    const {
+      data,
+      error
+    }=
+      await sb
+        .from(MASTER_TABLE)
+        .select('*')
+        .range(
+          from,
+          from+pageSize-1
+        );
+
+    if(error)
+      throw error;
+
+    all.push(
+      ...(data||[])
+    );
+
+    if(
+      !data ||
+      data.length<pageSize
+    )
+      break;
+
+    from+=pageSize;
+
+  }
+
+  master=all;
+
+  const first=
+    master[0]||{};
+
+  schema.pml=
+    actualColumn(
+      first,
+      'PML'
+    );
+
+  schema.ppl=
+    actualColumn(
+      first,
+      'PPL'
+    );
+
+  schema.kec=
+    actualColumn(
+      first,
+      'Kecamatan'
+    );
+
+}
+
+
+/* =====================================================
+   LOAD all_sls
+===================================================== */
+
+async function loadAllSls(){
+
+  const pageSize=1000;
+
+  let from=0;
+
+  const all=[];
+
+  while(true){
+
+    const {
+      data,
+      error
+    }=
+      await sb
+        .from(ALL_SLS_TABLE)
+        .select('*')
+        .range(
+          from,
+          from+pageSize-1
+        );
+
+    if(error)
+      throw error;
+
+    all.push(
+      ...(data||[])
+    );
+
+    if(
+      !data ||
+      data.length<pageSize
+    )
+      break;
+
+    from+=pageSize;
+
+  }
+
+  allSls=all;
+
+}
+
+
+/* =====================================================
+   LOAD LOGS
+===================================================== */
+
+async function loadAllLogs(
+  endDate='2026-09-30'
+){
+
+  const {
+    data,
+    error
+  }=
+    await sb
+      .from(LOG_TABLE)
+      .select('*')
+      .gte(
+        'tanggal',
+        '2026-09-17'
+      )
+      .lte(
+        'tanggal',
+        endDate
+      );
+
+  if(error)
+    throw error;
+
+  return data||[];
+
+}
+
+
+async function loadLogsFor(ids){
+
+  if(!ids.length){
+
+    logs=[];
+
+    return;
+
+  }
+
+  const {
+    data,
+    error
+  }=
+    await sb
+      .from(LOG_TABLE)
+      .select('*')
+      .in(
+        'idsls',
+        ids
+      )
+      .gte(
+        'tanggal',
+        '2026-09-17'
+      )
+      .lte(
+        'tanggal',
+        '2026-09-30'
+      );
+
+  if(error)
+    throw error;
+
+  logs=data||[];
+
+}
+
+
+/* =====================================================
+   DATE SELECTS
+===================================================== */
+
+function fillDates(){
+
+  const opts=
+    dates
+      .map(
+        d=>
+          `<option value="${d}">
+            ${fmtDate(d)}
+          </option>`
+      )
+      .join('');
+
+  $('dateSelect').innerHTML=
+    '<option value="">Select date</option>'
+    +
+    opts;
+
+  [
+    'allDate',
+    'desaDate',
+    'kecDate'
+  ].forEach(id=>{
+
+    $(id).innerHTML=opts;
+
+    $(id).value=
+      dates[dates.length-1];
+
+  });
+
+}
+
+
+/* =====================================================
+   PML SEARCH
+===================================================== */
+
+let pmlOptions=[];
+
+
+function fillPmls(){
+
+  pmlOptions=
+    people('PML');
+
+  renderPmlDropdown('');
+
+}
+
+
+function renderPmlDropdown(
+  search=''
+){
+
+  const dropdown=
+    $('pmlDropdown');
+
+  const term=
+    search
+      .trim()
+      .toLowerCase();
+
+  const matches=
+    pmlOptions.filter(
+      p=>
+        p.toLowerCase()
+          .includes(term)
+    );
+
+  dropdown.innerHTML=
+    matches.length
+      ?
+        matches
+          .map(
+            p=>
+              `<div
+                 class="search-option"
+                 data-value="${esc(p)}"
+               >
+                 ${esc(p)}
+               </div>`
+          )
+          .join('')
+      :
+        '<div class="search-empty">No PML found.</div>';
+
+  dropdown.classList.remove(
+    'hidden'
+  );
+
+  dropdown
+    .querySelectorAll(
+      '.search-option'
+    )
+    .forEach(
+      option=>
+        option.addEventListener(
+          'mousedown',
+          e=>{
+
+            e.preventDefault();
+
+            const value=
+              option.dataset.value;
+
+            $('pmlSearch').value=
+              value;
+
+            $('welcomePml').value=
+              value;
+
+            dropdown.classList.add(
+              'hidden'
+            );
+
+          }
+        )
+    );
+
+}
+
+
+$('pmlSearch')
+  .addEventListener(
+    'focus',
+    ()=>
+      renderPmlDropdown(
+        $('pmlSearch').value
+      )
+  );
+
+
+$('pmlSearch')
+  .addEventListener(
+    'input',
+    ()=>{
+
+      $('welcomePml').value='';
+
+      renderPmlDropdown(
+        $('pmlSearch').value
+      );
+
+    }
+  );
+
+
+document.addEventListener(
+  'click',
+  e=>{
+
+    if(
+      $('pmlSearchBox')
+      &&
+      !$('pmlSearchBox')
+        .contains(e.target)
+    ){
+
+      $('pmlDropdown')
+        .classList
+        .add('hidden');
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   PML / PPL
+===================================================== */
+
+function setPml(pml){
+
+  selectedPml=pml;
+
+  $('pmlSelect').innerHTML=
+    `<option value="${esc(pml)}">
+      ${esc(pml)}
+    </option>`;
+
+  const ppl=[
+    ...new Set(
+      master
+        .filter(
+          r=>
+            String(
+              getField(r,'PML')??''
+            ).trim()===pml
+        )
+        .map(
+          r=>
+            String(
+              getField(r,'PPL')??''
+            ).trim()
+        )
+        .filter(Boolean)
+    )
+  ].sort(
+    (a,b)=>
+      a.localeCompare(b)
+  );
+
+  $('pplSelect').innerHTML=
+    '<option value="">Select PPL</option>'
+    +
+    ppl
+      .map(
+        x=>
+          `<option value="${esc(x)}">
+            ${esc(x)}
+          </option>`
+      )
+      .join('');
+
+  selectedPpl='';
+  selectedDate='';
+
+  $('dateSelect').value='';
+
+  $('entryTable').innerHTML=
+    '<div class="empty">Select PPL and date.</div>';
+
+  $('summaryTable').innerHTML=
+    '<div class="empty">Select PPL and date.</div>';
+
+}
+
+
+/* =====================================================
+   DAILY ENTRY
+===================================================== */
+
+function renderEntry(){
+
+  const rows=
+    rowsForPpl();
+
+  $('rowCount').textContent=
+    rows.length+' SLS';
+
+  if(
+    !selectedPpl ||
+    !selectedDate
+  ){
+
+    $('entryTable').innerHTML=
+      '<div class="empty">Select PPL and date.</div>';
+
+    return;
+
+  }
+
+  if(!rows.length){
+
+    $('entryTable').innerHTML=
+      '<div class="empty">No SLS found.</div>';
+
+    return;
+
+  }
+
+
+  $('entryTable').innerHTML=`
+
+    <table class="sticky-first">
+
+      <thead>
+
+        <tr>
+
+          <th>idsls</th>
+          <th>desa</th>
+          <th>nama sls</th>
+          <th>target</th>
+          <th>% capaian</th>
+          <th>realisasi keluarga</th>
+          <th>realisasi usaha np</th>
+          <th>realisasi usaha pertanian</th>
+          <th>submit</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${
+          rows.map(r=>{
+
+            const id=
+              getField(
+                r,
+                'idsls'
+              );
+
+            const l=
+              currentLog(
+                id,
+                selectedDate
+              );
+
+            const target=
+              n(
+                getField(
+                  r,
+                  'Total Target'
+                )
+              );
+
+            const p=
+              priorityValue(r);
+
+            const existingKel=
+              n(
+                l.realisasi_keluarga
+              );
+
+            const existingNp=
+              n(
+                l.realisasi_usaha_np
+              );
+
+            const existingPert=
+              n(
+                l.realisasi_usaha_pertanian
+              );
+
+            const totalCapaian=
+              cumulativeFromMaster(
+                id,
+                selectedDate
+              );
+
+            const submit=
+              n(l.submit);
+
+            return `
+
+              <tr data-id="${esc(id)}">
+
+                <td>
+                  ${esc(id)}
+                  ${priorityDot(p)}
+                </td>
+
+                <td>
+                  ${esc(
+                    getField(
+                      r,
+                      'desa'
+                    )
+                  )}
+                </td>
+
+                <td>
+                  ${esc(
+                    getField(
+                      r,
+                      'namasls'
+                    )
+                  )}
+                </td>
+
+                <td class="num">
+                  ${target}
+                </td>
+
+                <td class="num pct">
+
+                  ${fmtPct(
+                    pct(
+                      totalCapaian,
+                      target
+                    )
+                  )}
+
+                  ${coverageLabel(
+                    totalCapaian,
+                    target
+                  )}
+
+                </td>
+
+                <td>
+                  <input
+                    class="entry"
+                    type="number"
+                    min="0"
+                    step="1"
+                    data-field="realisasi_keluarga"
+                    value="${existingKel||''}"
+                  >
+                </td>
+
+                <td>
+                  <input
+                    class="entry"
+                    type="number"
+                    min="0"
+                    step="1"
+                    data-field="realisasi_usaha_np"
+                    value="${existingNp||''}"
+                  >
+                </td>
+
+                <td>
+                  <input
+                    class="entry"
+                    type="number"
+                    min="0"
+                    step="1"
+                    data-field="realisasi_usaha_pertanian"
+                    value="${existingPert||''}"
+                  >
+                </td>
+
+                <td class="num readonly">
+                  ${submit||''}
+                </td>
+
+              </tr>
+
+            `;
+
+          }).join('')
+        }
+
+      </tbody>
+
+    </table>
+
+  `;
+
+
+  $('entryTable')
+    .querySelectorAll('input')
+    .forEach(i=>{
+
+      i.addEventListener(
+        'blur',
+        ()=>
+          queueSave(
+            i.closest('tr')
+              .dataset.id
+          )
+      );
+
+      i.addEventListener(
+        'keydown',
+        e=>{
+
+          if(e.key==='Enter')
+            i.blur();
+
+        }
+      );
+
+    });
+
+}
+
+
+/* =====================================================
+   SAVE DAILY ENTRY
+===================================================== */
+
+async function saveRow(id){
+
+  const tr=
+    $('entryTable')
+      .querySelector(
+        `tr[data-id="${CSS.escape(String(id))}"]`
+      );
+
+  if(!tr)
+    return;
+
+  const payload={
+    idsls:id,
+    tanggal:selectedDate
+  };
+
+  let hasEntry=false;
+
+
+  tr
+    .querySelectorAll(
+      'input[data-field]'
+    )
+    .forEach(i=>{
+
+      const v=
+        i.value.trim();
+
+      payload[i.dataset.field]=
+        v===''
+          ? 0
+          : n(v);
+
+      if(v!=='')
+        hasEntry=true;
+
+    });
+
+
+  if(!hasEntry)
+    return;
+
+
+  $('entryStatus').className=
+    'status saving';
+
+  $('entryStatus').textContent=
+    'Saving…';
+
+
+  const upsertPayload={
+    ...payload,
+    updated_at:
+      new Date().toISOString()
+  };
+
+
+  const {
+    data,
+    error
+  }=
+    await sb
+      .from(LOG_TABLE)
+      .upsert(
+        upsertPayload,
+        {
+          onConflict:
+            'idsls,tanggal'
+        }
+      )
+      .select()
+      .single();
+
+
+  if(error){
+
+    $('entryStatus').className=
+      'status error';
+
+    $('entryStatus').textContent=
+      'Save failed: '
+      +
+      error.message;
+
+    return;
+
+  }
+
+
+  const idx=
+    logs.findIndex(
+      x=>
+        String(x.idsls)===String(id)
+        &&
+        x.tanggal===selectedDate
+    );
+
+
+  if(idx>=0)
+    logs[idx]=data;
+  else
+    logs.push(data);
+
+
+  $('entryStatus').className=
+    'status saved';
+
+  $('entryStatus').textContent=
+    'Saved automatically.';
+
+
+  renderEntry();
+  renderSummary();
+
+}
+
+
+function queueSave(id){
+
+  clearTimeout(
+    saveTimers.get(id)
+  );
+
+  saveTimers.set(
+    id,
+    setTimeout(
+      ()=>
+        saveRow(id),
+      250
+    )
+  );
+
+}
+
+
+async function choosePplDate(){
+
+  selectedPpl=
+    $('pplSelect').value;
+
+  selectedDate=
+    $('dateSelect').value;
+
+
+  if(
+    !selectedPpl ||
+    !selectedDate
+  ){
+
+    renderEntry();
+    renderSummary();
+
+    return;
+
+  }
+
+
+  $('entryTable').innerHTML=
+    '<div class="loading">Loading…</div>';
+
+
+  try{
+
+    await loadLogsFor(
+      rowsForPpl()
+        .map(
+          r=>
+            getField(
+              r,
+              'idsls'
+            )
+        )
+        .filter(Boolean)
+    );
+
+    renderEntry();
+    renderSummary();
+
+  }catch(e){
+
+    $('entryTable').innerHTML=
+      `<div class="empty error">
+        ${esc(e.message)}
+      </div>`;
+
+  }
+
+}
+
+
+/* =====================================================
+   SUMMARY PPL
+===================================================== */
+
+function renderSummary(){
+
+  const rows=
+    rowsForPpl();
+
+  if(
+    !selectedPpl ||
+    !selectedDate
+  ){
+
+    $('summaryTable').innerHTML=
+      '<div class="empty">Select PPL and date.</div>';
+
+    return;
+
+  }
+
+
+  $('summaryTitle').textContent=
+    `Summary PPL ${selectedPpl}`;
+
+
+  $('summaryTable').innerHTML=`
+
+    <table class="sticky-first">
+
+      <thead>
+
+        <tr>
+
+          <th>idsls</th>
+          <th>desa</th>
+          <th>target</th>
+          <th>% capaian</th>
+          <th>total progress per hari</th>
+          <th>total realisasi sampai hari yang dipilih</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${
+          rows.map(r=>{
+
+            const id=
+              getField(
+                r,
+                'idsls'
+              );
+
+            const target=
+              n(
+                getField(
+                  r,
+                  'Total Target'
+                )
+              );
+
+            const cum=
+              cumulativeFromMaster(
+                id,
+                selectedDate
+              );
+
+            return `
+
+              <tr>
+
+                <td>
+                  ${esc(id)}
+                  ${priorityDot(
+                    priorityValue(r)
+                  )}
+                </td>
+
+                <td>
+                  ${esc(
+                    getField(
+                      r,
+                      'desa'
+                    )
+                  )}
+                </td>
+
+                <td class="num">
+                  ${target}
+                </td>
+
+                <td class="num pct">
+
+                  ${fmtPct(
+                    pct(
+                      cum,
+                      target
+                    )
+                  )}
+
+                  ${coverageLabel(
+                    cum,
+                    target
+                  )}
+
+                </td>
+
+                <td class="num">
+                  ${daily(
+                    id,
+                    selectedDate
+                  )??''}
+                </td>
+
+                <td class="num">
+                  ${cum||''}
+                </td>
+
+              </tr>
+
+            `;
+
+          }).join('')
+        }
+
+      </tbody>
+
+    </table>
+
+  `;
+
+}
+
+
+/* =====================================================
+   FILTERS
+===================================================== */
+
+function filteredMaster(
+  pmlSel,
+  pplSel,
+  search
+){
+
+  const term=
+    (search||'')
+      .trim()
+      .toLowerCase();
+
+  return master.filter(r=>{
+
+    const pml=
+      String(
+        getField(r,'PML')??''
+      ).trim();
+
+    const ppl=
+      String(
+        getField(r,'PPL')??''
+      ).trim();
+
+
+    if(
+      pmlSel &&
+      pml!==pmlSel
+    )
+      return false;
+
+
+    if(
+      pplSel &&
+      ppl!==pplSel
+    )
+      return false;
+
+
+    if(!term)
+      return true;
+
+
+    return [
+      getField(r,'idsls'),
+      getField(r,'desa'),
+      getField(r,'namasls'),
+      getField(r,'PPL'),
+      getField(r,'PML'),
+      getField(r,'Kecamatan')
+    ].some(
+      v=>
+        String(v??'')
+          .toLowerCase()
+          .includes(term)
+    );
+
+  });
+
+}
+
+
+function fillSelect(
+  id,
+  values,
+  allLabel
+){
+
+  $(id).innerHTML=
+    `<option value="">
+      ${allLabel}
+    </option>`
+    +
+    values
+      .map(
+        v=>
+          `<option value="${esc(v)}">
+            ${esc(v)}
+          </option>`
+      )
+      .join('');
+
+}
+
+
+function refreshFilterPpl(
+  pmlId,
+  pplId
+){
+
+  const pml=
+    $(pmlId).value;
+
+  const ppl=[
+    ...new Set(
+      master
+        .filter(
+          r=>
+            !pml
+            ||
+            String(
+              getField(
+                r,
+                'PML'
+              )??''
+            ).trim()===pml
+        )
+        .map(
+          r=>
+            String(
+              getField(
+                r,
+                'PPL'
+              )??''
+            ).trim()
+        )
+        .filter(Boolean)
+    )
+  ].sort(
+    (a,b)=>
+      a.localeCompare(b)
+  );
+
+
+  fillSelect(
+    pplId,
+    ppl,
+    'All PPL'
+  );
+
+}
+
+
+function initSummaryFilters(){
+
+  const pmls=
+    people('PML');
+
+
+  fillSelect(
+    'allPml',
+    pmls,
+    'All PML'
+  );
+
+  refreshFilterPpl(
+    'allPml',
+    'allPpl'
+  );
+
+
+  fillSelect(
+    'detailPml',
+    pmls,
+    'All PML'
+  );
+
+  refreshFilterPpl(
+    'detailPml',
+    'detailPpl'
+  );
+
+}
+
+
+/* =====================================================
+   ALL PPL / PML
+===================================================== */
+
+function renderAll(){
+
+  const date=
+    $('allDate').value;
+
+  const pml=
+    $('allPml').value;
+
+  const ppl=
+    $('allPpl').value;
+
+  const search=
+    $('allSearch').value;
+
+
+  $('allStatus').textContent=
+    'Loading…';
+
+
+  loadAllLogs(date)
+    .then(data=>{
+
+      const rows=
+        filteredMaster(
+          pml,
+          ppl,
+          search
+        );
+
+
+      $('allStatus').textContent=
+        rows.length+' SLS';
+
+
+      $('allTable').innerHTML=`
+
+        <table class="sticky-first">
+
+          <thead>
+
+            <tr>
+
+              <th>idsls</th>
+              <th>desa</th>
+              <th>nama sls</th>
+              <th>PPL</th>
+              <th>PML</th>
+              <th>target</th>
+              <th>% capaian</th>
+
+              ${
+                dates.map(
+                  d=>
+                    `<th class="day-head">
+                      ${Number(
+                        d.slice(-2)
+                      )}
+                    </th>`
+                ).join('')
+              }
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            ${
+              rows.map(r=>{
+
+                const id=
+                  String(
+                    getField(
+                      r,
+                      'idsls'
+                    )
+                  );
+
+                const target=
+                  n(
+                    getField(
+                      r,
+                      'Total Target'
+                    )
+                  );
+
+                const total=
+                  cumulativeFromDataWithMaster(
+                    id,
+                    date,
+                    data
+                  );
+
+                return `
+
+                  <tr>
+
+                    <td>
+                      ${esc(id)}
+                      ${priorityDot(
+                        priorityValue(r)
+                      )}
+                    </td>
+
+                    <td>
+                      ${esc(
+                        getField(
+                          r,
+                          'desa'
+                        )
+                      )}
+                    </td>
+
+                    <td>
+                      ${esc(
+                        getField(
+                          r,
+                          'namasls'
+                        )
+                      )}
+                    </td>
+
+                    <td>
+                      ${esc(
+                        getField(
+                          r,
+                          'PPL'
+                        )
+                      )}
+                    </td>
+
+                    <td>
+                      ${esc(
+                        getField(
+                          r,
+                          'PML'
+                        )
+                      )}
+                    </td>
+
+                    <td class="num">
+                      ${target}
+                    </td>
+
+                    <td class="num pct">
+
+                      ${fmtPct(
+                        pct(
+                          total,
+                          target
+                        )
+                      )}
+
+                      ${coverageLabel(
+                        total,
+                        target
+                      )}
+
+                    </td>
+
+                    ${
+                      dates.map(
+                        d=>
+                          `<td class="num">
+                            ${
+                              dailyFromData(
+                                id,
+                                d,
+                                data
+                              )??''
+                            }
+                          </td>`
+                      ).join('')
+                    }
+
+                  </tr>
+
+                `;
+
+              }).join('')
+            }
+
+          </tbody>
+
+        </table>
+
+      `;
+
+    })
+    .catch(e=>{
+
+      $('allStatus').textContent=
+        'Error: '+e.message;
+
+    });
+
+}
+
+
+function cumulativeFromDataWithMaster(
+  id,
+  date,
+  data
+){
+
+  const r=
+    master.find(
+      x=>
+        String(
+          getField(
+            x,
+            'idsls'
+          )
+        )===String(id)
+    );
+
+
+  const base=
+    r
+      ? baseTotalCapaian(r)
+      : 0;
+
+
+  return (
+    base
+    +
+    (data||[])
+      .filter(
+        x=>
+          String(x.idsls)===String(id)
+          &&
+          x.tanggal<=date
+      )
+      .reduce(
+        (s,x)=>
+          s+totalProgress(x),
+        0
+      )
+  );
+
+}
+
+
+function dailyFromData(
+  id,
+  date,
+  data
+){
+
+  const x=
+    (data||[]).find(
+      v=>
+        String(v.idsls)===String(id)
+        &&
+        v.tanggal===date
+    );
+
+  return x
+    ? totalProgress(x)
+    : null;
+
+}
+
+
+/* =====================================================
+   RINCIAN SLS
+===================================================== */
+
+function renderDetail(){
+
+  const pml=
+    $('detailPml').value;
+
+  const ppl=
+    $('detailPpl').value;
+
+  const search=
+    $('detailSearch').value;
+
+
+  $('detailStatus').textContent=
+    'Loading…';
+
+
+  loadAllLogs(
+    '2026-09-30'
+  )
+  .then(data=>{
+
+    logs=data||[];
+
+
+    const rows=
+      filteredMaster(
+        pml,
+        ppl,
+        search
+      );
+
+
+    $('detailStatus').textContent=
+      rows.length+' SLS';
+
+
+    $('detailTable').innerHTML=`
+
+      <table class="sticky-first">
+
+        <thead>
+
+          <tr>
+
+            <th rowspan="2">
+              idsls
+            </th>
+
+            <th rowspan="2">
+              desa
+            </th>
+
+            <th rowspan="2">
+              nama sls
+            </th>
+
+            <th rowspan="2">
+              PPL
+            </th>
+
+            <th rowspan="2">
+              PML
+            </th>
+
+            ${
+              dates.map(
+                d=>
+                  `<th
+                     class="day-head"
+                     colspan="3"
+                   >
+                    ${Number(
+                      d.slice(-2)
+                    )}
+                   </th>`
+              ).join('')
+            }
+
+          </tr>
+
+          <tr>
+
+            ${
+              dates.map(
+                ()=>
+                  `
+                    <th class="subhead">
+                      kel
+                    </th>
+
+                    <th class="subhead">
+                      np
+                    </th>
+
+                    <th class="subhead">
+                      pert
+                    </th>
+                  `
+              ).join('')
+            }
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${
+            rows.map(r=>{
+
+              const id=
+                getField(
+                  r,
+                  'idsls'
+                );
+
+              return `
+
+                <tr>
+
+                  <td>
+                    ${esc(id)}
+                    ${priorityDot(
+                      priorityValue(r)
+                    )}
+                  </td>
+
+                  <td>
+                    ${esc(
+                      getField(
+                        r,
+                        'desa'
+                      )
+                    )}
+                  </td>
+
+                  <td>
+                    ${esc(
+                      getField(
+                        r,
+                        'namasls'
+                      )
+                    )}
+                  </td>
+
+                  <td>
+                    ${esc(
+                      getField(
+                        r,
+                        'PPL'
+                      )
+                    )}
+                  </td>
+
+                  <td>
+                    ${esc(
+                      getField(
+                        r,
+                        'PML'
+                      )
+                    )}
+                  </td>
+
+                  ${
+                    dates.map(
+                      d=>{
+
+                        const a=
+                          componentFromData(
+                            id,
+                            d,
+                            data,
+                            'realisasi_keluarga'
+                          );
+
+                        const b=
+                          componentFromData(
+                            id,
+                            d,
+                            data,
+                            'realisasi_usaha_np'
+                          );
+
+                        const c=
+                          componentFromData(
+                            id,
+                            d,
+                            data,
+                            'realisasi_usaha_pertanian'
+                          );
+
+                        return `
+
+                          <td class="num">
+                            ${a??''}
+                          </td>
+
+                          <td class="num">
+                            ${b??''}
+                          </td>
+
+                          <td class="num">
+                            ${c??''}
+                          </td>
+
+                        `;
+
+                      }
+                    ).join('')
+                  }
+
+                </tr>
+
+              `;
+
+            }).join('')
+          }
+
+        </tbody>
+
+      </table>
+
+    `;
+
+  })
+  .catch(e=>{
+
+    $('detailStatus').textContent=
+      'Error: '+e.message;
+
+  });
+
+}
+
+
+function componentFromData(
+  id,
+  date,
+  data,
+  field
+){
+
+  const x=
+    (data||[]).find(
+      v=>
+        String(v.idsls)===String(id)
+        &&
+        v.tanggal===date
+    );
+
+  return x
+    ? n(x[field])
+    : null;
+
+}
+
+
+/* =====================================================
+   REKAP DESA / KECAMATAN
+   *** NOW USES all_sls ***
+===================================================== */
+
+function renderGrouped(kind){
+
+  const date=
+    $(
+      kind==='desa'
+        ? 'desaDate'
+        : 'kecDate'
+    ).value;
+
+
+  const search=
+    $(
+      kind==='desa'
+        ? 'desaSearch'
+        : 'kecSearch'
+    )
+    .value
+    .trim()
+    .toLowerCase();
+
+
+  const status=
+    $(
+      kind==='desa'
+        ? 'desaStatus'
+        : 'kecStatus'
+    );
+
+
+  const targetEl=
+    $(
+      kind==='desa'
+        ? 'desaTable'
+        : 'kecTable'
+    );
+
+
+  status.textContent=
+    'Loading…';
+
+
+  loadAllLogs(date)
+    .then(data=>{
+
+
+      /*
+       * Build a map of additional revisit
+       * progress by SLS.
+       */
+
+      const logMap=
+        new Map();
+
+
+      (data||[]).forEach(x=>{
+
+        const id=
+          String(x.idsls);
+
+        const current=
+          logMap.get(id)||0;
+
+        logMap.set(
+          id,
+          current+
+          totalProgress(x)
+        );
+
+      });
+
+
+      /*
+       * IMPORTANT:
+       *
+       * Rekap Desa and Rekap Kecamatan
+       * start from all_sls, NOT revisit_sls.
+       *
+       * This means SLS which are NOT being
+       * revisited will still appear.
+       */
+
+      const groups=
+        new Map();
+
+
+      allSls.forEach(r=>{
+
+        const id=
+          String(
+            getField(
+              r,
+              'idsls'
+            )??''
+          );
+
+
+        if(!id)
+          return;
+
+
+        /*
+         * Desa:
+         * first 10 digits
+         *
+         * Kecamatan:
+         * first 7 digits
+         */
+
+        const code=
+          id.slice(
+            0,
+            kind==='desa'
+              ? 10
+              : 7
+          );
+
+
+        if(!code)
+          return;
+
+
+        const kec=
+          String(
+            getField(
+              r,
+              'Kecamatan'
+            )??''
+          ).trim();
+
+
+        const desa=
+          String(
+            getField(
+              r,
+              'desa'
+            )??''
+          ).trim();
+
+
+        /*
+         * Search only relevant recap
+         * information.
+         */
+
+        if(
+          search &&
+          ![
+            kec,
+            desa,
+            code,
+            id
+          ].some(
+            v=>
+              String(v)
+                .toLowerCase()
+                .includes(search)
+          )
+        ){
+
+          return;
+
+        }
+
+
+        if(
+          !groups.has(code)
+        ){
+
+          groups.set(
+            code,
+            {
+              code,
+              kec,
+              desa,
+              target:0,
+              total:0
+            }
+          );
+
+        }
+
+
+        const g=
+          groups.get(code);
+
+
+        /*
+         * TARGET
+         *
+         * Comes from all_sls.
+         */
+
+        g.target+=
+          n(
+            getField(
+              r,
+              'Total Target'
+            )
+          );
+
+
+        /*
+         * TOTAL
+         *
+         * Baseline Total Capaian
+         * from all_sls
+         *
+         * +
+         *
+         * additional revisit_daily
+         */
+
+        g.total+=
+          n(
+            getField(
+              r,
+              'Total Capaian'
+            )
+          )
+          +
+          (
+            logMap.get(id)||0
+          );
+
+
+        if(!g.kec)
+          g.kec=kec;
+
+
+        if(!g.desa)
+          g.desa=desa;
+
+      });
+
+
+      const rows=
+        [...groups.values()]
+          .sort(
+            (a,b)=>
+              a.code.localeCompare(
+                b.code
+              )
+          );
+
+
+      status.textContent=
+        rows.length
+        +
+        (
+          kind==='desa'
+            ? ' desa'
+            : ' kecamatan'
+        );
+
+
+      /* =================================================
+         REKAP DESA
+      ================================================= */
+
+      if(
+        kind==='desa'
+      ){
+
+        targetEl.innerHTML=`
+
+          <table class="sticky-second">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Kecamatan
+                </th>
+
+                <th>
+                  Desa
+                </th>
+
+                <th>
+                  Target
+                </th>
+
+                <th>
+                  % Capaian
+                </th>
+
+                <th>
+                  Total
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              ${
+                rows.map(
+                  g=>{
+
+                    const percentage=
+                      pct(
+                        g.total,
+                        g.target
+                      );
+
+
+                    return `
+
+                      <tr>
+
+                        <td>
+                          ${esc(
+                            g.kec ||
+                            g.code
+                          )}
+                        </td>
+
+                        <td>
+                          ${esc(
+                            g.desa ||
+                            g.code
+                          )}
+                        </td>
+
+                        <td class="num">
+                          ${g.target}
+                        </td>
+
+                        <td class="num pct">
+
+                          ${fmtPct(
+                            percentage
+                          )}
+
+                          ${coverageLabel(
+                            g.total,
+                            g.target
+                          )}
+
+                        </td>
+
+                        <td class="num">
+                          ${g.total||''}
+                        </td>
+
+                      </tr>
+
+                    `;
+
+                  }
+                ).join('')
+              }
+
+            </tbody>
+
+          </table>
+
+        `;
+
+        return;
+
+      }
+
+
+      /* =================================================
+         REKAP KECAMATAN
+      ================================================= */
+
+      targetEl.innerHTML=`
+
+        <table>
+
+          <thead>
+
+            <tr>
+
+              <th>
+                Kecamatan
+              </th>
+
+              <th>
+                Target
+              </th>
+
+              <th>
+                % Capaian
+              </th>
+
+              <th>
+                Total
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            ${
+              rows.map(
+                g=>{
+
+                  const percentage=
+                    pct(
+                      g.total,
+                      g.target
+                    );
+
+
+                  return `
+
+                    <tr>
+
+                      <td>
+                        ${esc(
+                          g.kec ||
+                          g.code
+                        )}
+                      </td>
+
+                      <td class="num">
+                        ${g.target}
+                      </td>
+
+                      <td class="num pct">
+
+                        ${fmtPct(
+                          percentage
+                        )}
+
+                        ${coverageLabel(
+                          g.total,
+                          g.target
+                        )}
+
+                      </td>
+
+                      <td class="num">
+                        ${g.total||''}
+                      </td>
+
+                    </tr>
+
+                  `;
+
+                }
+              ).join('')
+            }
+
+          </tbody>
+
+        </table>
+
+      `;
+
+    })
+    .catch(e=>{
+
+      status.textContent=
+        'Error: '+e.message;
+
+    });
+
+}
+
+
+/* =====================================================
+   PAGE NAVIGATION
+===================================================== */
+
+function showPage(name){
+
+  const pages={
+    daily:'dailyPage',
+    all:'allPage',
+    detail:'detailPage',
+    desa:'desaPage',
+    kec:'kecPage'
+  };
+
+
+  Object.values(pages)
+    .forEach(
+      id=>
+        $(id)
+          .classList
+          .add('hidden')
+    );
+
+
+  $(pages[name])
+    .classList
+    .remove('hidden');
+
+
+  document
+    .querySelectorAll(
+      '.nav .btn'
+    )
+    .forEach(
+      b=>
+        b.classList
+          .remove('active')
+    );
+
+
+  const nav={
+    daily:'dailyNav',
+    all:'allNav',
+    detail:'detailNav',
+    desa:'desaNav',
+    kec:'kecNav'
+  };
+
+
+  $(nav[name])
+    .classList
+    .add('active');
+
+
+  if(name==='all')
+    renderAll();
+
+  if(name==='detail')
+    renderDetail();
+
+  if(name==='desa')
+    renderGrouped('desa');
+
+  if(name==='kec')
+    renderGrouped('kec');
+
+}
+
+
+/* =====================================================
+   EVENTS
+===================================================== */
+
+$('startBtn').onclick=()=>{
+
+  const p=
+    $('welcomePml').value;
+
+
+  if(!p){
+
+    $('welcomeStatus').className=
+      'status error';
+
+    $('welcomeStatus').textContent=
+      'Select a PML from the dropdown first.';
+
+    return;
+
+  }
+
+
+  setPml(p);
+
+  $('welcome')
+    .classList
+    .add('hidden');
+
+  $('app')
+    .classList
+    .remove('hidden');
+
+};
+
+
+$('pplSelect').onchange=
+  choosePplDate;
+
+$('dateSelect').onchange=
+  choosePplDate;
+
+
+$('pmlSelect').onchange=
+  e=>
+    setPml(
+      e.target.value
+    );
+
+
+$('dailyNav').onclick=
+  ()=>
+    showPage('daily');
+
+
+$('allNav').onclick=
+  ()=>
+    showPage('all');
+
+
+$('detailNav').onclick=
+  ()=>
+    showPage('detail');
+
+
+$('desaNav').onclick=
+  ()=>
+    showPage('desa');
+
+
+$('kecNav').onclick=
+  ()=>
+    showPage('kec');
+
+
+$('changePml').onclick=()=>{
+
+  $('app')
+    .classList
+    .add('hidden');
+
+  $('welcome')
+    .classList
+    .remove('hidden');
+
+};
+
+
+$('allPml').onchange=()=>{
+
+  refreshFilterPpl(
+    'allPml',
+    'allPpl'
+  );
+
+  renderAll();
+
+};
+
+
+$('allPpl').onchange=
+  renderAll;
+
+$('allDate').onchange=
+  renderAll;
+
+$('allSearch').oninput=
+  renderAll;
+
+
+$('detailPml').onchange=()=>{
+
+  refreshFilterPpl(
+    'detailPml',
+    'detailPpl'
+  );
+
+  renderDetail();
+
+};
+
+
+$('detailPpl').onchange=
+  renderDetail;
+
+$('detailSearch').oninput=
+  renderDetail;
+
+
+$('desaDate').onchange=
+  ()=>
+    renderGrouped('desa');
+
+$('desaSearch').oninput=
+  ()=>
+    renderGrouped('desa');
+
+
+$('kecDate').onchange=
+  ()=>
+    renderGrouped('kec');
+
+$('kecSearch').oninput=
+  ()=>
+    renderGrouped('kec');
+
+
+/* =====================================================
+   INITIALIZATION
+===================================================== */
+
+(async function init(){
+
+  fillDates();
+
+
+  try{
+
+    if(
+      SUPABASE_URL.startsWith('YOUR_')
+      ||
+      SUPABASE_KEY.startsWith('YOUR_')
+    ){
+
+      throw new Error(
+        'Fill SUPABASE_URL and SUPABASE_KEY in the HTML first.'
+      );
+
+    }
+
+
+    /*
+     * Load both tables.
+     *
+     * revisit_sls:
+     *   Daily Entry
+     *   All PPL / PML
+     *   Rincian SLS
+     *
+     * all_sls:
+     *   Rekap Desa
+     *   Rekap Kecamatan
+     */
+
+    await loadMaster();
+
+    await loadAllSls();
+
+
+    fillPmls();
+
+    initSummaryFilters();
+
+
+    $('welcomeStatus').textContent=
+      `Loaded ${
+        master.length.toLocaleString()
+      } revisit SLS and ${
+        allSls.length.toLocaleString()
+      } total SLS. Found ${
+        people('PML').length
+      } unique PML.`;
+
+  }
+  catch(e){
+
+    $('welcomeStatus').className=
+      'status error';
+
+    $('welcomeStatus').textContent=
+      'Supabase load failed: '
+      +
+      e.message;
+
+    $('pmlDropdown').innerHTML=
+      '<div class="search-empty">Could not load PML.</div>';
+
+  }
+
+})();
+
+</script>
+
+</body>
+</html>
