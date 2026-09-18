@@ -445,7 +445,7 @@ tr:last-child td{
     </button>
 
     <button id="allNav" class="btn">
-      All PPL / PML
+      Semua SLS
     </button>
 
     <button id="detailNav" class="btn">
@@ -461,7 +461,7 @@ tr:last-child td{
     </button>
 
     <button id="changePml" class="btn secondary">
-      Change PML
+      Ganti Entri PML
     </button>
 
   </div>
@@ -485,7 +485,7 @@ tr:last-child td{
         <div class="field">
           <label>PPL</label>
           <select id="pplSelect">
-            <option value="">Select PPL</option>
+            <option value="">Pilih PPL</option>
           </select>
         </div>
 
@@ -508,7 +508,7 @@ tr:last-child td{
     <div class="title-row">
 
       <h2>
-        Table 1 — Daily Revisit Entry
+        Entri Progress Harian
       </h2>
 
       <span id="rowCount" class="status"></span>
@@ -541,7 +541,7 @@ tr:last-child td{
 
     <div id="entryTable" class="table-wrap">
       <div class="empty">
-        Select PPL and date.
+        Pilih PPL dan tanggal.
       </div>
     </div>
 
@@ -553,7 +553,7 @@ tr:last-child td{
       </h2>
 
       <span class="status">
-        Cumulative through selected date
+        Progress Kumulatif hingga tanggal terpilih
       </span>
 
       <span class="priority-legend">
@@ -584,7 +584,7 @@ tr:last-child td{
 
     <div id="summaryTable" class="table-wrap">
       <div class="empty">
-        Select PPL and date.
+        Pilih PPL dan tanggal untuk melihat ringkasan.
       </div>
     </div>
 
@@ -602,37 +602,37 @@ tr:last-child td{
       <div class="toolbar">
 
         <div class="field small">
-          <label>End date</label>
+          <label>Tanggal Terakhir</label>
           <select id="allDate"></select>
         </div>
 
         <div class="field">
           <label>PML filter</label>
           <select id="allPml">
-            <option value="">All PML</option>
+            <option value="">Semua PML</option>
           </select>
         </div>
 
         <div class="field">
           <label>PPL filter</label>
           <select id="allPpl">
-            <option value="">All PPL</option>
+            <option value="">Semua PPL</option>
           </select>
         </div>
 
         <div class="field search">
-          <label>Search</label>
+          <label>Cari</label>
           <input
             id="allSearch"
             type="search"
-            placeholder="Search idsls, desa, nama SLS, PPL or PML..."
+            placeholder="Cari idsls, desa, nama SLS, PPL or PML..."
           >
         </div>
 
       </div>
 
       <div class="filter-note">
-        Each date shows only the progress entered on that day; blank means no entry.
+        Setiap tanggal hanya menampilkan progress yang dimasukkan pada hari itu; kosong berarti tidak ada progress yang dientri.
       </div>
 
       <div
@@ -647,7 +647,7 @@ tr:last-child td{
     <div class="title-row">
 
       <h2>
-        All PPL / PML Summary
+        Progress Harian Semua SLS
       </h2>
 
       <span class="priority-legend">
@@ -696,30 +696,30 @@ tr:last-child td{
         <div class="field">
           <label>PML filter</label>
           <select id="detailPml">
-            <option value="">All PML</option>
+            <option value="">Semua PML</option>
           </select>
         </div>
 
         <div class="field">
           <label>PPL filter</label>
           <select id="detailPpl">
-            <option value="">All PPL</option>
+            <option value="">Semua PPL</option>
           </select>
         </div>
 
         <div class="field search">
-          <label>Search</label>
+          <label>Cari</label>
           <input
             id="detailSearch"
             type="search"
-            placeholder="Search idsls, desa, nama SLS, PPL or PML..."
+            placeholder="Cari idsls, desa, nama SLS, PPL or PML..."
           >
         </div>
 
       </div>
 
       <div class="filter-note">
-        Each date shows only the progress entered that day:
+        Setiap tanggal hanya menampilkan progres yang dimasukkan pada hari itu; kosong berarti tidak ada progres yang dientri. Kolom progres terdiri dari 3 komponen:
         keluarga, non pertanian, pertanian.
       </div>
 
@@ -786,11 +786,11 @@ tr:last-child td{
         </div>
 
         <div class="field search">
-          <label>Search</label>
+          <label>Cari</label>
           <input
             id="desaSearch"
             type="search"
-            placeholder="Search kecamatan or desa..."
+            placeholder="Cari kecamatan or desa..."
           >
         </div>
 
@@ -840,11 +840,11 @@ tr:last-child td{
         </div>
 
         <div class="field search">
-          <label>Search</label>
+          <label>Cari</label>
           <input
             id="kecSearch"
             type="search"
-            placeholder="Search kecamatan..."
+            placeholder="Cari kecamatan..."
           >
         </div>
 
@@ -1502,7 +1502,7 @@ function fillDates(){
       .join('');
 
   $('dateSelect').innerHTML=
-    '<option value="">Select date</option>'
+    '<option value="">Pilih tanggal</option>'
     +
     opts;
 
@@ -1693,7 +1693,7 @@ function setPml(pml){
   );
 
   $('pplSelect').innerHTML=
-    '<option value="">Select PPL</option>'
+    '<option value="">Pilih PPL</option>'
     +
     ppl
       .map(
@@ -1710,10 +1710,10 @@ function setPml(pml){
   $('dateSelect').value='';
 
   $('entryTable').innerHTML=
-    '<div class="empty">Select PPL and date.</div>';
+    '<div class="empty">Pilih PPL dan tanggal.</div>';
 
   $('summaryTable').innerHTML=
-    '<div class="empty">Select PPL and date.</div>';
+    '<div class="empty">Pilih PPL dan tanggal.</div>';
 
 }
 
@@ -1736,7 +1736,7 @@ function renderEntry(){
   ){
 
     $('entryTable').innerHTML=
-      '<div class="empty">Select PPL and date.</div>';
+      '<div class="empty">Pilih PPL dan tanggal.</div>';
 
     return;
 
@@ -1745,7 +1745,7 @@ function renderEntry(){
   if(!rows.length){
 
     $('entryTable').innerHTML=
-      '<div class="empty">No SLS found.</div>';
+      '<div class="empty">Tidak ada SLS yang ditemukan.</div>';
 
     return;
 
