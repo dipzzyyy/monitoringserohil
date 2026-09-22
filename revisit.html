@@ -874,6 +874,15 @@ tr:last-child td{
       <div class="loading">Loading...</div>
     </div>
 
+    <div class="title-row">
+      <h2>Rekap Harian Kecamatan</h2>
+      <span class="status">Progress per hari · keluarga, non pertanian, pertanian</span>
+    </div>
+
+    <div id="kecDailyTable" class="table-wrap">
+      <div class="loading">Loading...</div>
+    </div>
+
   </section>
 
 </section>
@@ -3455,6 +3464,314 @@ function renderGrouped(kind){
 
 }
 
+function renderKecDailySummary(endDate, search = '') {
+  const targetEl = $('kecDailyTable');
+
+  if (!targetEl) return;
+
+  targetEl.innerHTML = '<div class="loading">Loading…</div>';
+
+  const visibleDates = dates.filter(d => d <= endDate);
+  const searchText = String(search || '').toLowerCase().trim();
+
+  loadAllLogs(endDate)
+    .then(data => {
+
+      // =========================
+      // MAP SLS → KECAMATAN
+      // =========================
+
+      const kecBySls = new Map();
+
+      allSls.forEach(r => {
+        const id = String(getField(r, 'idsls') ?? '').trim();
+
+        if (!id) return;
+
+        const kec = String(
+          getField(r, 'Kecamatan') ?? ''
+        ).trim();
+
+        const code = id.slice(0, 7);
+
+        kecBySls.set(id, {
+          kec: kec || code,
+          code: code
+        });
+      });
+
+
+      // =========================
+      // CREATE KECAMATAN GROUPS
+      // =========================
+
+      const groups = new Map();
+
+      allSls.forEach(r => {
+
+        const id = String(
+          getField(r, 'idsls') ?? ''
+        ).trim();
+
+        if (!id) return;
+
+        const info = kecBySls.get(id);
+
+        if (!info) return;
+
+
+        // Search
+        if (searchText) {
+
+          const matches = [
+            info.kec,
+            info.code,
+            id
+          ].some(v =>
+            String(v ?? '')
+              .toLowerCase()
+              .includes(searchText)
+          );
+
+          if (!matches) return;
+        }
+
+
+        if (!groups.has(info.code)) {
+
+          groups.set(info.code, {
+            code: info.code,
+            kec: info.kec,
+            days: {}
+          });
+
+        }
+
+
+        const g = groups.get(info.code);
+
+
+        visibleDates.forEach(d => {
+
+          if (!g.days[d]) {
+
+            g.days[d] = {
+              keluarga: 0,
+              np: 0,
+              pertanian: 0
+            };
+
+          }
+
+        });
+
+      });
+
+
+      // =========================
+      // ADD DAILY LOGS
+      // =========================
+
+      (data || []).forEach(x => {
+
+        const id = String(
+          x.idsls ?? ''
+        ).trim();
+
+        const info = kecBySls.get(id);
+
+        if (!info) return;
+
+        const date = String(
+          x.tanggal ?? ''
+        );
+
+        if (!visibleDates.includes(date)) return;
+
+
+        if (searchText) {
+
+          const matches = [
+            info.kec,
+            info.code,
+            id
+          ].some(v =>
+            String(v ?? '')
+              .toLowerCase()
+              .includes(searchText)
+          );
+
+          if (!matches) return;
+
+        }
+
+
+        if (!groups.has(info.code)) {
+
+          groups.set(info.code, {
+            code: info.code,
+            kec: info.kec,
+            days: {}
+          });
+
+        }
+
+
+        const g = groups.get(info.code);
+
+
+        if (!g.days[date]) {
+
+          g.days[date] = {
+            keluarga: 0,
+            np: 0,
+            pertanian: 0
+          };
+
+        }
+
+
+        g.days[date].keluarga += n(
+          x.realisasi_keluarga
+        );
+
+        g.days[date].np += n(
+          x.realisasi_usaha_np
+        );
+
+        g.days[date].pertanian += n(
+          x.realisasi_usaha_pertanian
+        );
+
+      });
+
+
+      // =========================
+      // SORT
+      // =========================
+
+      const rows = [...groups.values()].sort(
+        (a, b) =>
+          a.code.localeCompare(b.code)
+      );
+
+
+      $('kecStatus').textContent =
+        rows.length + ' kecamatan';
+
+
+      if (!rows.length) {
+
+        targetEl.innerHTML =
+          '<div class="empty">Tidak ada kecamatan yang ditemukan.</div>';
+
+        return;
+
+      }
+
+
+      // =========================
+      // BUILD TABLE
+      // =========================
+
+      let html = '';
+
+      html += '<table class="sticky-first">';
+
+      // HEADER ROW 1
+      html += '<thead>';
+      html += '<tr>';
+
+      html += '<th rowspan="2">Kecamatan</th>';
+
+      visibleDates.forEach(d => {
+
+        html +=
+          '<th class="day-head" colspan="3">' +
+          Number(d.slice(-2)) +
+          '</th>';
+
+      });
+
+      html += '</tr>';
+
+
+      // HEADER ROW 2
+      html += '<tr>';
+
+      visibleDates.forEach(() => {
+
+        html += '<th class="subhead">kel</th>';
+        html += '<th class="subhead">np</th>';
+        html += '<th class="subhead">pert</th>';
+
+      });
+
+      html += '</tr>';
+      html += '</thead>';
+
+
+      // BODY
+      html += '<tbody>';
+
+      rows.forEach(g => {
+
+        html += '<tr>';
+
+        html +=
+          '<td>' +
+          esc(g.kec || g.code) +
+          '</td>';
+
+
+        visibleDates.forEach(d => {
+
+          const day = g.days[d] || {
+            keluarga: 0,
+            np: 0,
+            pertanian: 0
+          };
+
+
+          html +=
+            '<td class="num">' +
+            (day.keluarga || '') +
+            '</td>';
+
+          html +=
+            '<td class="num">' +
+            (day.np || '') +
+            '</td>';
+
+          html +=
+            '<td class="num">' +
+            (day.pertanian || '') +
+            '</td>';
+
+        });
+
+
+        html += '</tr>';
+
+      });
+
+      html += '</tbody>';
+      html += '</table>';
+
+
+      targetEl.innerHTML = html;
+
+    })
+    .catch(e => {
+
+      targetEl.innerHTML =
+        '<div class="empty error">' +
+        esc(e.message) +
+        '</div>';
+
+    });
+}
+
 
 /* =====================================================
    PAGE NAVIGATION
@@ -3519,8 +3836,13 @@ function showPage(name){
   if(name==='desa')
     renderGrouped('desa');
 
-  if(name==='kec')
+  if(name==='kec'){
     renderGrouped('kec');
+    renderKecDailySummary(
+      $('kecDate').value,
+      $('kecSearch').value.trim().toLowerCase()
+    );
+  }
 
 }
 
@@ -3664,12 +3986,22 @@ $('desaSearch').oninput=
 
 
 $('kecDate').onchange=
-  ()=>
+  () =>{
     renderGrouped('kec');
+    renderKecDailySummary(
+      $('kecDate').value,
+      $('kecSearch').value.trim().toLowerCase()
+    );
+  };
 
 $('kecSearch').oninput=
-  ()=>
+  () =>{
     renderGrouped('kec');
+    renderKecDailySummary(
+      $('kecDate').value,
+      $('kecSearch').value.trim().toLowerCase()
+    );
+  };
 
 
 /* =====================================================
